@@ -2,9 +2,12 @@ import { Recipe } from "./recipe.model";
 import { Injectable } from "@angular/core";
 import { Ingredient } from "../shared/ingredient.model";
 import { ShoppingListService } from "../shopping-list/shopping-list.service";
+import { Subject } from "rxjs/Subject";
 
 @Injectable()
 export class RecipeService {
+    recipesChanged = new Subject<Recipe[]>();
+
     private recipes: Recipe[] = [
         new Recipe('Chicken Fajita Wrap', 'Mouth watering spanish wrap', 'https://static.pexels.com/photos/461198/pexels-photo-461198.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb', [
             new Ingredient('Meet', 1),
@@ -28,6 +31,10 @@ export class RecipeService {
 
     }
 
+    setRecipes(recipes: Recipe[]) {
+        this.recipes = recipes;
+        this.recipesChanged.next(this.recipes.slice());
+    }
     getRecipes() {
         return this.recipes.slice();
     }
@@ -38,5 +45,20 @@ export class RecipeService {
 
     addIngredientsToShoppingList(ingredients: Ingredient[]) {
         this.slService.addIngredients(ingredients);
+    }
+
+    addRecipe(recipe: Recipe) {
+        this.recipes.push(recipe);
+        this.recipesChanged.next(this.recipes.slice());
+    }
+
+    updateRecipe(index: number, newRecipe: Recipe) {
+        this.recipes[index] = newRecipe;
+        this.recipesChanged.next(this.recipes.slice());
+    }
+
+    deleteRecipe(index: number) {
+        this.recipes.splice(index, 1);
+        this.recipesChanged.next(this.recipes.slice());
     }
 }

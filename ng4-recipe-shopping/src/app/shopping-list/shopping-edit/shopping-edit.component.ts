@@ -20,7 +20,7 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
   @ViewChild('f') slForm: NgForm;
 
   ngOnInit() {
-    this.slService.staredEditing
+    this.subscription = this.slService.staredEditing
       .subscribe(
         (index: number) => {
           this.editedItemIndex = index;
