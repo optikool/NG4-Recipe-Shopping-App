@@ -8,8 +8,11 @@ import { RecipeService } from './recipe.service';
   providers: []
 })
 export class RecipesComponent implements OnInit {
-  
-  constructor() { }
+  selectedRecipe;
+
+  constructor() {
+    this.selectedRecipe = null;
+  }
 
   ngOnInit() {
 

@@ -88,6 +88,10 @@ export class RecipeEditComponent implements OnInit {
       'imagePath': new FormControl(recipeImagePath, Validators.required),
       'description': new FormControl(recipeDescripition, Validators.required),
       'ingredients': recipeIngredients
-    })
+    });
+  }
+
+  get formData() { 
+    return <FormArray>this.recipeForm.get('ingredients'); 
   }
 }
