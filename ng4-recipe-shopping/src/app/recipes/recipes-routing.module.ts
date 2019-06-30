@@ -20,6 +20,4 @@ const recipesRoutes: Routes = [
     exports: [RouterModule],
     providers: [AuthGuard]
 })
-export class RecipesRoutingModule {
-
-}
+export class RecipesRoutingModule {}

@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
-import { RecipeService } from '../recipe.service';
-import { Recipe } from '../recipe.model';
+import * as RecipeActions from '../store/recipe.actions';
+import * as fromRecipe from '../store/recipe.reducers';
+import { Store } from '../../../../node_modules/@ngrx/store';
 
 @Component({
   selector: 'app-recipe-edit',
@@ -14,7 +15,10 @@ export class RecipeEditComponent implements OnInit {
   editMode: Boolean = false;
   recipeForm: FormGroup;
   
-  constructor(private router: Router, private route: ActivatedRoute, private recipeService: RecipeService) { }
+  constructor(
+    private router: Router, 
+    private route: ActivatedRoute, 
+    private store: Store<fromRecipe.FeatureState>) { }
 
   ngOnInit() {
     this.route.params
@@ -28,9 +32,11 @@ export class RecipeEditComponent implements OnInit {
   onSubmit() {
     console.log('this.recipeForm.value: ', this.recipeForm.value);
     if (this.editMode) {
-      this.recipeService.updateRecipe(this.id, this.recipeForm.value);
+      this.store.dispatch(new RecipeActions.UpdateRecipe({
+        index: this.id, 
+        updateRecipe: this.recipeForm.value}));
     } else {
-      this.recipeService.addRecipe(this.recipeForm.value);
+      this.store.dispatch(new RecipeActions.AddRecipe(this.recipeForm.value))
     }
 
     this.onCancel();
@@ -63,9 +69,11 @@ export class RecipeEditComponent implements OnInit {
     let recipeIngredients = new FormArray([]);
 
     if (this.editMode) {
-      const recipe = this.recipeService.getRecipe(this.id);
-      console.log('initForm recipe: ', recipe);
-      recipeName = recipe.name;
+      this.store.select('recipes')
+        .take(1)
+        .subscribe((recipeState: fromRecipe.State) => {
+          const recipe = recipeState.recipes[this.id];
+          recipeName = recipe.name;
       recipeImagePath = recipe.imagePath;
       recipeDescripition = recipe.description;
 
@@ -82,6 +90,7 @@ export class RecipeEditComponent implements OnInit {
           )
         }
       }
+        });
     }
     this.recipeForm = new FormGroup({
       'name': new FormControl(recipeName, Validators.required),
